@@ -1,4 +1,4 @@
-const ytdl = require("@distube/ytdl-core")
+const axios = require("axios")
 
 module.exports = {
     name: "dld",
@@ -15,33 +15,32 @@ Example:
 .dld https://youtu.be/xxxx`
         }
 
-        if (!ytdl.validateURL(args)) {
-            return "❌ Invalid YouTube link"
-        }
-
         try {
 
-            const info = await ytdl.getInfo(args)
+            const api = `https://api.cobalt.tools/api/json`
 
-            const title = info.videoDetails.title
-            const duration = info.videoDetails.lengthSeconds
+            const res = await axios.post(api, {
+                url: args,
+                vCodec: "h264",
+                vQuality: "max",
+                aFormat: "mp3"
+            })
 
-            const formats = ytdl.filterFormats(info.formats, "videoandaudio")
-
-            const best = formats.sort((a,b) => b.bitrate - a.bitrate)[0]
+            if (!res.data.url) {
+                return "⚠ Failed to fetch download"
+            }
 
             return `📥 *Cobra Downloader*
 
-🎬 Title: ${title}
+🎬 Video Link:
+${args}
 
-⏱ Duration: ${Math.floor(duration/60)} minutes
-
-⬇ Max Quality Download:
-${best.url}`
-
+⬇ Download (Max Quality):
+${res.data.url}`
+            
         } catch (err) {
 
-            console.log("YTDL ERROR:", err)
+            console.log("YTDL ERROR:", err.message)
 
             return "⚠ Failed to fetch video"
         }
