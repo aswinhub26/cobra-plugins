@@ -1,36 +1,60 @@
 const axios = require("axios")
 
+const languageMap = {
+    english: "en",
+    tamil: "ta",
+    hindi: "hi",
+    french: "fr",
+    spanish: "es",
+    german: "de",
+    chinese: "zh",
+    japanese: "ja"
+}
+
 module.exports = {
     name: "translate",
 
     async execute(user, args) {
 
         if (!args) {
-            return `🌐 *Cobra Translator*
+            return `🌍 *Cobra Translator*
 
 Usage:
-.translate <text> <language>
+.translate hello ta
+.translate hello to tamil
 
 Examples:
-.translate hello ta
-.translate வணக்கம் en
-.translate bonjour hi
-
-Language Codes:
-en = English
-ta = Tamil
-hi = Hindi
-fr = French
-es = Spanish`
+.translate hello to french
+.translate வணக்கம் to english
+.translate bonjour to hindi`
         }
 
-        const parts = args.split(" ")
+        let text = ""
+        let targetLang = ""
 
-        const targetLang = parts.pop()
-        const text = parts.join(" ")
+        // Case 1: "hello to tamil"
+        if (args.includes(" to ")) {
+
+            const parts = args.split(" to ")
+
+            text = parts[0].trim()
+
+            const langName = parts[1].trim().toLowerCase()
+
+            targetLang = languageMap[langName] || langName
+
+        } 
+        else {
+
+            // Case 2: "hello ta"
+            const parts = args.split(" ")
+
+            targetLang = parts.pop()
+            text = parts.join(" ")
+        }
 
         if (!text || !targetLang) {
-            return "❌ Usage: .translate hello ta"
+            return "❌ Usage: .translate hello to tamil"
         }
 
         try {
@@ -45,12 +69,14 @@ es = Spanish`
 
 📝 Text: ${text}
 
-🌐 Target: ${targetLang}
+🌐 Target Language: ${targetLang}
 
 ✨ Translation:
 ${translated}`
 
         } catch (err) {
+
+            console.log(err)
 
             return "⚠ Translation service error"
         }
