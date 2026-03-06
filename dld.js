@@ -1,4 +1,4 @@
-const ytdl = require("ytdl-core")
+const ytdl = require("@distube/ytdl-core")
 
 module.exports = {
     name: "dld",
@@ -26,7 +26,7 @@ Example:
             const title = info.videoDetails.title
             const duration = info.videoDetails.lengthSeconds
 
-            const formats = ytdl.filterFormats(info.formats, 'videoandaudio')
+            const formats = ytdl.filterFormats(info.formats, "videoandaudio")
 
             const best = formats.sort((a,b) => b.bitrate - a.bitrate)[0]
 
@@ -36,10 +36,8 @@ Example:
 
 ⏱ Duration: ${Math.floor(duration/60)} minutes
 
-⬇ Best Quality Download:
-${best.url}
-
-Open link to download in maximum quality.`
+⬇ Max Quality Download:
+${best.url}`
 
         } catch (err) {
 
