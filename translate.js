@@ -5,18 +5,18 @@ module.exports = {
 
     async execute(user, args) {
 
-        if (!args || !args.includes("|")) {
+        if (!args) {
             return `🌐 *Cobra Translator*
 
 Usage:
-.translate text | language_code
+.translate <text> <language>
 
-Example:
-.translate hello | ta
-.translate வணக்கம் | en
-.translate bonjour | hi
+Examples:
+.translate hello ta
+.translate வணக்கம் en
+.translate bonjour hi
 
-Supported examples:
+Language Codes:
 en = English
 ta = Tamil
 hi = Hindi
@@ -24,25 +24,28 @@ fr = French
 es = Spanish`
         }
 
-        const parts = args.split("|")
+        const parts = args.split(" ")
 
-        const text = parts[0].trim()
-        const targetLang = parts[1].trim()
+        const targetLang = parts.pop()
+        const text = parts.join(" ")
+
+        if (!text || !targetLang) {
+            return "❌ Usage: .translate hello ta"
+        }
 
         try {
 
-            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=auto|${targetLang}`
+            const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=en|${targetLang}`
 
             const res = await axios.get(url)
 
             const translated = res.data.responseData.translatedText
-            const detected = res.data.responseData.match
 
             return `🌍 *Cobra Translation*
 
 📝 Text: ${text}
 
-🌐 Target Language: ${targetLang}
+🌐 Target: ${targetLang}
 
 ✨ Translation:
 ${translated}`
