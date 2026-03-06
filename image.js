@@ -1,3 +1,5 @@
+const axios = require("axios")
+
 module.exports = {
     name: "image",
 
@@ -16,32 +18,44 @@ Usage:
         let style = ""
 
         if (args.includes("-style")) {
-
             const parts = args.split("-style")
-
             prompt = parts[0].trim()
             style = parts[1].trim()
-
         }
 
         const finalPrompt = style
             ? `${prompt}, ${style} style, ultra detailed`
             : prompt
 
-        const imageUrl =
-            `https://image.pollinations.ai/prompt/${encodeURIComponent(finalPrompt)}?seed=${Math.floor(Math.random()*9999)}`
+        const url =
+            `https://image.pollinations.ai/prompt/${encodeURIComponent(finalPrompt)}?width=1024&height=1024&seed=${Math.floor(Math.random()*10000)}`
 
-        return {
-            text: `🎨 *Cobra Image Generator*
+        try {
+
+            const res = await axios.get(url, {
+                responseType: "arraybuffer",
+                timeout: 30000,
+                headers: {
+                    "User-Agent": "Mozilla/5.0"
+                }
+            })
+
+            return {
+                text: `🎨 *Cobra Image Generator*
 
 🧠 Prompt: ${prompt}
-
 🎭 Style: ${style || "default"}
 
 ⚡ Generating image...
 ⏱ Estimated time: ~5 seconds`,
-            image: imageUrl
-        }
+                buffer: res.data
+            }
 
+        } catch (err) {
+
+            console.log("IMAGE ERROR:", err.message)
+
+            return "⚠ Image generation failed"
+        }
     }
 }
