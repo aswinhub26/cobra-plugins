@@ -1,45 +1,46 @@
-const axios = require("axios")
+const Replicate = require("replicate")
+
+const replicate = new Replicate({
+  auth: process.env.REPLICATE_API_TOKEN
+})
 
 module.exports = {
-    name: "image",
-    description: "Generate AI image",
+  name: "image",
+  description: "Generate AI image",
 
-    async execute(user, prompt) {
+  async execute(user, prompt) {
 
-        if (!prompt) {
-            return `🎨 Cobra Image Generator
+    if (!prompt) {
+      return `🎨 Cobra Image Generator
 
 Usage:
 .image prompt
 
 Example:
 .image cyberpunk cobra`
+    }
+
+    try {
+
+      const output = await replicate.run(
+        "stability-ai/sdxl:39ed52f2a78e934a",
+        {
+          input: { prompt: prompt }
         }
+      )
 
-        try {
-
-            const response = await axios.post(
-                "https://api.deepai.org/api/text2img",
-                { text: prompt },
-                {
-                    headers: {
-                        "api-key": process.env.DEEPAI_API_KEY
-                    }
-                }
-            )
-
-            return {
-                image: { url: response.data.output_url },
-                caption: `🎨 Cobra AI Image
+      return {
+        image: { url: output[0] },
+        caption: `🎨 Cobra AI Image
 
 🧠 Prompt: ${prompt}`
-            }
+      }
 
-        } catch (err) {
+    } catch (err) {
 
-            console.log("IMAGE ERROR:", err.message)
+      console.log("IMAGE ERROR:", err)
 
-            return "⚠ Image generation failed"
-        }
+      return "⚠ Image generation failed"
     }
+  }
 }
