@@ -1,46 +1,18 @@
-const Replicate = require("replicate")
-
-const replicate = new Replicate({
-  auth: process.env.REPLICATE_API_TOKEN
-})
-
 module.exports = {
-  name: "image",
-  description: "Generate AI image",
+    name: "image",
 
-  async execute(user, prompt) {
+    async execute(user, prompt) {
 
-    if (!prompt) {
-      return `🎨 Cobra Image Generator
-
-Usage:
-.image prompt
-
-Example:
-.image cyberpunk cobra`
-    }
-
-    try {
-
-      const output = await replicate.run(
-        "stability-ai/sdxl:39ed52f2a78e934a",
-        {
-          input: { prompt: prompt }
+        if (!prompt) {
+            return "🎨 Usage:\n.image prompt"
         }
-      )
 
-      return {
-        image: { url: output[0] },
-        caption: `🎨 Cobra AI Image
+        const url =
+        `https://picsum.photos/seed/${encodeURIComponent(prompt)}/1024/1024`
 
-🧠 Prompt: ${prompt}`
-      }
-
-    } catch (err) {
-
-      console.log("IMAGE ERROR:", err)
-
-      return "⚠ Image generation failed"
+        return {
+            image: { url: url },
+            caption: `🎨 Cobra Image\n\nPrompt: ${prompt}`
+        }
     }
-  }
 }
